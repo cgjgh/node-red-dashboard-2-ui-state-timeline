@@ -1,0 +1,36 @@
+{
+  "ui-state-timeline": {
+      "label": {
+          "name": "Name",
+          "group": "Group",
+          "size": "Size",
+          "width": "Width",
+          "height": "Height",
+          "label": "Label",
+          "barHeight": "Bar Height",
+          "states": "States",
+          "timeFormat": "Time Format",
+          "minTimeLabelGap": "Min Label Gap (%)",
+          "rangeLimit": "Time Range Limit",
+          "liveUpdate": "Live Update",
+          "showTimeMarkers": "Show time markers",
+          "showOnlyStartEndTimes": "Show only start and end times",
+          "paletteLabel": "state timeline",
+          "default": "State Timeline"
+      },
+      "option": {
+          "seconds": "Seconds",
+          "minutes": "Minutes",
+          "hours": "Hours",
+          "days": "Days",
+          "weeks": "Weeks"
+      },
+      "tip": {
+          "liveUpdate": "Update last segment end time every 5 seconds",
+          "showOnlyStartEndTimes": "Only show time at start and end of timeline bar"
+      },
+      "help": {
+          "timeFormat": "Format string for displaying time labels (e.g., 'hh:mm a'). Supported tokens: YYYY (4-digit year), YY (2-digit year), MM (2-digit month), M (month), DD (2-digit day), D (day), hh (2-digit 12-hour), h (12-hour), HH (2-digit 24-hour), H (24-hour), mm (2-digit minutes), m (minutes), a (am/pm), A (AM/PM)."
+      }
+  }
+}

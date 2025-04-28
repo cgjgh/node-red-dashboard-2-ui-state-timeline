@@ -1,0 +1,158 @@
+<script type="text/html" data-help-name="ui-state-timeline">
+<p>
+    The <b>State Timeline</b> node visualizes the history of a device or process state over time as a horizontal timeline bar. Each segment of the bar represents a period during which the state was constant, with color coding and labels for each state. This is useful for monitoring state transitions (e.g., On/Off, Running/Stopped, etc.) and visualizing uptime, downtime, or other discrete state changes.
+</p>
+
+<h3>Properties</h3>
+<dl class="message-properties">
+    <dt>Name <span class="property-type">string</span></dt>
+    <dd>Optional label for the node instance.</dd>
+
+    <dt>Group <span class="property-type">ui-group</span></dt>
+    <dd>The dashboard group where the timeline will be displayed.</dd>
+
+    <dt>Size (Width x Height) <span class="property-type">number</span></dt>
+    <dd>Controls the size of the timeline widget within the dashboard group.</dd>
+
+    <dt>Label <span class="property-type">string</span></dt>
+    <dd>Text shown above the timeline in the dashboard.</dd>
+
+    <dt>Bar Height <span class="property-type">number</span></dt>
+    <dd>Height of the timeline bar in pixels.</dd>
+
+    <dt>States <span class="property-type">array</span></dt>
+    <dd>
+        <p>Defines the possible states to be visualized. Each state includes:</p>
+        <ul>
+            <li><b>Label</b>: Display name for the state.</li>
+            <li><b>Value</b>: The value to match in incoming messages (must be unique for each state).</li>
+            <li><b>Type</b>: Data type for the value (string, number, boolean, JSON).</li>
+            <li><b>Color</b>: Color used for the timeline segment representing this state.</li>
+        </ul>
+        <p>At least two states must be configured, and all values must be unique.</p>
+    </dd>
+
+    <dt>Time Format <span class="property-type">string</span></dt>
+    <dd>
+        Format string for displaying time labels (e.g., <code>hh:mm a</code>). Supports the following tokens:<br>
+        <code>YYYY</code> (4-digit year), <code>YY</code> (2-digit year), <code>MM</code> (2-digit month), <code>M</code> (month), <code>DD</code> (2-digit day), <code>D</code> (day),<br>
+        <code>hh</code> (2-digit 12-hour), <code>h</code> (12-hour), <code>HH</code> (2-digit 24-hour), <code>H</code> (24-hour), <code>mm</code> (2-digit minutes), <code>m</code> (minutes), <code>a</code> (am/pm), <code>A</code> (AM/PM).
+    </dd>
+
+    <dt>Min Label Gap (%) <span class="property-type">number</span></dt>
+    <dd>
+        Minimum gap (as a percentage of the timeline width) between time labels to avoid overlap.
+    </dd>
+
+    <dt>Time Range Limit <span class="property-type">number</span></dt>
+    <dd>
+        The maximum time window (e.g., 24 hours) to display in the timeline. Older segments are hidden.
+    </dd>
+
+    <dt>Time Range Unit <span class="property-type">list</span></dt>
+    <dd>
+        The unit for the time range limit (Seconds, Minutes, Hours, Days, Weeks).
+    </dd>
+
+    <dt>Live Update <span class="property-type">boolean</span></dt>
+    <dd>
+        If enabled, the end time of the last segment is updated every 5 seconds to reflect the current time, as long as the state remains unchanged.
+    </dd>
+
+    <dt>Show Time Markers <span class="property-type">boolean</span></dt>
+    <dd>
+        If enabled, time markers are displayed along the timeline.
+    </dd>
+
+    <dt>Show Only Start/End Times <span class="property-type">boolean</span></dt>
+    <dd>
+        If enabled, only the start and end times are shown on the timeline bar.
+    </dd>
+</dl>
+
+<h3>Input</h3>
+<p>
+    The State Timeline node accepts messages to update the timeline. The payload can be either a single state change, an array of state changes, or an empty array to clear the timeline.
+</p>
+<dl class="message-properties">
+    <dt>Single State Change <span class="property-type">object</span></dt>
+    <dd>
+        <pre>msg.payload = { time: 1717000000000, state: "on" }</pre>
+        <ul>
+            <li><b>time</b>: Timestamp in milliseconds (e.g., from <code>Date.now()</code>).</li>
+            <li><b>state</b>: The state value (must match one of the configured states).</li>
+        </ul>
+        <p>
+            Each message marks a transition to a new state at the given time. The timeline will extend the previous segment and start a new one for the new state.
+        </p>
+    </dd>
+
+    <dt>Array of State Changes <span class="property-type">array</span></dt>
+    <dd>
+        <pre>msg.payload = [
+    { time: 1717000000000, state: "on" },
+    { time: 1717003600000, state: "off" },
+    { time: 1717007200000, state: "on" }
+]</pre>
+        <p>
+            An array of state changes, each with a <code>time</code> and <code>state</code>. The array should be sorted by time. The node will construct the timeline from these segments.
+        </p>
+    </dd>
+
+    <dt>Clear Timeline <span class="property-type">array</span></dt>
+    <dd>
+        <pre>msg.payload = []</pre>
+        <p>
+            Sending an empty array as the payload will clear all timeline data, removing all segments from the display.
+        </p>
+    </dd>
+</dl>
+
+<h3>Dynamic Properties (Inputs)</h3>
+<p>
+    Any of the following can be appended to a <code>msg.ui_update</code> object to override or set properties on this node at runtime.
+</p>
+<dl class="message-properties">
+    <dt class="optional">title <span class="property-type">string</span></dt>
+    <dd>Override the configured label/title.</dd>
+
+    <dt class="optional">barHeight <span class="property-type">number</span></dt>
+    <dd>Override the configured bar height.</dd>
+
+    <dt class="optional">timeFormat <span class="property-type">string</span></dt>
+    <dd>Override the configured time format for labels.</dd>
+
+    <dt class="optional">minTimeLabelGap <span class="property-type">number</span></dt>
+    <dd>Override the minimum label gap percentage.</dd>
+
+    <dt class="optional">showTimeMarkers <span class="property-type">boolean</span></dt>
+    <dd>Override the time marker display setting.</dd>
+
+    <dt class="optional">showOnlyStartEndTimes <span class="property-type">boolean</span></dt>
+    <dd>Override the setting to show only start/end times.</dd>
+</dl>
+
+<h3>Output</h3>
+<p>
+    The node outputs the current timeline state as:
+</p>
+<pre>
+msg.payload = {
+    stateData: [
+        { start: "2024-05-29T10:00:00.000Z", end: "2024-05-29T11:00:00.000Z", state: "on" },
+        { start: "2024-05-29T11:00:00.000Z", end: "2024-05-29T12:00:00.000Z", state: "off" }
+    ]
+}
+</pre>
+<p>
+    Each segment includes the start and end time (ISO string) and the state value.
+</p>
+
+<h3>Notes</h3>
+<ul>
+    <li>State values must match one of the configured states. Invalid or duplicate states are ignored.</li>
+    <li>Time must be a number (milliseconds since epoch). Out-of-order or overlapping times are ignored.</li>
+    <li>At least two unique states must be configured for the timeline to function.</li>
+    <li>Live Update will keep the last segment's end time current until a new state is received.</li>
+</ul>
+</script>

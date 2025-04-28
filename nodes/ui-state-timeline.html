@@ -1,0 +1,299 @@
+<script type="text/javascript">
+    (function () {
+        // Helper function from the example to generate default colors
+        function getColor (idx) {
+            const colors = ['#009933', '#999999', '#ff6666', '#009999', '#cccc00', '#ff33cc', '#cc6600',
+                '#99ff66', '#660033'
+            ]
+            if (idx > colors.length - 1) {
+                return colors[Math.floor(Math.random() * colors.length)]
+            }
+            return colors[idx]
+        }
+
+         // convert to i18 text
+         function c_ (x) {
+            return RED._('@cgjh/node-red-dashboard-2-ui-state-timeline/ui-state-timeline:ui-state-timeline.' + x)
+        }
+  
+        RED.nodes.registerType('ui-state-timeline', {
+            category: RED._('@flowfuse/node-red-dashboard/ui-base:ui-base.label.category'),
+            color: RED._('@flowfuse/node-red-dashboard/ui-base:ui-base.colors.medium'),
+            defaults: {
+                group: { type: 'ui-group', required: true },
+                name: { value: '' },
+                order: { value: 0 },
+                width: { value: 0 }, // Default set during init based on group
+                height: { value: 0 }, // Default set during init based on group
+                label: { value: 'state timeline' },
+                barHeight: { value: 30, validate: RED.validators.number() },
+                // Replaced colorMap with states, using array and validation like options
+                states: {
+                    value: [ // Provide some sensible defaults
+                        { label: 'On', value: 'on', valueType: 'str', color: '#009933' },
+                        { label: 'Off', value: 'off', valueType: 'str', color: '#999999' }
+                    ],
+                    validate: function (v) {
+                        // Validation similar to ui-button-group options
+                        const unique = new Set(v.map(function (o) { return o.value }))
+                        // Require unique values and at least two states
+                        return v.length === unique.size && v.length > 1
+                    }
+                },
+                timeFormat: { value: 'h:mm A' },
+                minTimeLabelGap: { value: 6, validate: RED.validators.number() },
+                liveUpdate: { value: true },
+                rangeLimit: { value: 24, validate: RED.validators.number() },
+                rangeLimitUnit: { value: '3600' }, // Default: hours (3600 seconds)
+                showTimeMarkers: { value: true },
+                showOnlyStartEndTimes: { value: true }
+            },
+            inputs: 1,
+            outputs: 1,
+            icon: 'font-awesome/fa-history',
+            paletteLabel: 'state timeline',
+            label: function () { return this.name || this.title || 'state timeline' },
+            labelStyle: function () { return this.name ? 'node_label_italic' : '' },
+            oneditprepare: function () {
+                const node = this; // Keep reference to the node instance
+  
+                // Handle sizing for subflows vs. regular flows
+                if (RED.nodes.subflow(this.z)) {
+                    $('#node-input-width').attr('type', 'text')
+                    $('#node-input-height').attr('type', 'text')
+                    $('div.form-row.nr-db-ui-element-sizer-row').hide()
+                    $('div.form-row.nr-db-ui-manual-size-row').show()
+                } else {
+                    $('div.form-row.nr-db-ui-element-sizer-row').show()
+                    $('div.form-row.nr-db-ui-manual-size-row').hide()
+                    // Init Group Size Editor
+                    $('#node-input-size').elementSizer({
+                        width: '#node-input-width',
+                        height: '#node-input-height',
+                        group: '#node-input-group'
+                    })
+                }
+  
+                // Initialize the editable list for states
+                const statesList = $('#node-input-states-container').css('min-height', '150px').editableList({
+                    header: $('<div>').css({ 'padding-left': '32px', 'padding-right': '32px', gap: '10px', display: 'flex' }).append($.parseHTML(
+                        "<div style='width:40%; display: inline-grid'><b data-i18n='ui-state-timeline.label.stateLabel'>Label</b></div>" +
+                        // Icon column removed
+                        "<div style='width:40%; display: inline-grid'><b data-i18n='ui-state-timeline.label.stateValue'>Value</b></div>" +
+                        "<div style='width:10%; display: inline-grid'><b data-i18n='ui-state-timeline.label.stateColor'>Color</b></div>")), // Adjusted widths
+                    addItem: function (container, i, state) {
+                        const row = $('<div/>').appendTo(container)
+  
+                        // Column 1: Label (text input)
+                        const labelField = $('<input/>', { class: 'node-input-state-label', type: 'text' }).css({ width: '40%', 'margin-left': '5px', 'margin-right': '5px' }).appendTo(row)
+                        labelField.val(state.label || '')
+  
+                        // Icon input removed
+  
+                        // Column 2: Value (typed input)
+                        const valueField = $('<input/>', { class: 'node-input-state-value', type: 'text' }).css({ width: '40%', 'margin-left': '5px', 'margin-right': '5px' }).appendTo(row)
+                        valueField.typedInput({ types: ['str', 'num', 'bool', 'json'] }) // Common types
+                        valueField.typedInput('type', state.valueType || 'str')
+                        valueField.typedInput('value', state.value || 'state_' + i) // Default value if needed
+                        valueField.on('change', function (type, value) {
+                            validate() // Re-validate on value change
+                        })
+  
+                        // Column 3: Color (color input)
+                        const colorField = $('<input/>', { class: 'node-input-state-color', type: 'color' }).css({ width: '10%', 'margin-left': '5px' }).appendTo(row)
+                        colorField.val(state.color || getColor(i)) // Use helper for default color
+  
+                        validate() // Validate after adding item
+                    },
+                    removeItem: function (data) {
+                        validate() // Re-validate after removing item
+                    },
+                    removable: true,
+                    sortable: true
+                })
+  
+                // Populate the list with existing states
+                if (this.states) {
+                    this.states.forEach(function (state, index) {
+                        // Add item without icon property
+                        statesList.editableList('addItem', { label: state.label, value: state.value, valueType: state.valueType, color: state.color })
+                    })
+                }
+  
+                // Validate function (adapted from ui-button-group)
+                function validate () {
+                    // Copy all the states from the editableList to the node property for validation
+                    const currentStates = []
+                    const stateRows = $('#node-input-states-container').editableList('items')
+                    stateRows.each(function (i) {
+                        const stateRow = $(this)
+                        const label = stateRow.find('.node-input-state-label').val()
+                        // Icon find removed
+                        const value = stateRow.find('.node-input-state-value').typedInput('value')
+                        const valueType = stateRow.find('.node-input-state-value').typedInput('type')
+                        const color = stateRow.find('.node-input-state-color').val()
+                        currentStates.push({ label, value, valueType, color }) // Save without icon
+                    })
+  
+                    // Use Set to check for unique values
+                    const uniqueValues = new Set(currentStates.map(function (o) { return o.value }))
+  
+                    if (currentStates.length !== uniqueValues.size) {
+                        $('#configError').text(RED._('ui-state-timeline.error.uniqueValues'))
+                        $('#configError').show()
+                    } else if (currentStates.length < 2) {
+                        $('#configError').text(RED._('ui-state-timeline.error.minStates'))
+                        $('#configError').show()
+                    } else {
+                        $('#configError').hide() // Options are valid
+                    }
+                }
+  
+                // Set the liveUpdate checkbox based on node property
+                $('#node-input-liveUpdate').prop('checked', !!this.liveUpdate);
+                
+                // Set initial values for range limit
+                $('#node-input-rangeLimit').val(this.rangeLimit || 24);
+                $('#node-input-rangeLimitUnit').val(this.rangeLimitUnit || '3600');
+
+                // Set initial values for time marker options
+                $('#node-input-showTimeMarkers').prop('checked', !!this.showTimeMarkers);
+                $('#node-input-showOnlyStartEndTimes').prop('checked', !!this.showOnlyStartEndTimes);
+
+                // Enable/disable dependent option
+                function updateShowOnlyStartEndTimesState() {
+                    if ($('#node-input-showTimeMarkers').is(':checked')) {
+                        $('#node-input-showOnlyStartEndTimes').prop('disabled', false);
+                    } else {
+                        $('#node-input-showOnlyStartEndTimes').prop('disabled', true).prop('checked', false);
+                    }
+                }
+                $('#node-input-showTimeMarkers').on('change', updateShowOnlyStartEndTimesState);
+                updateShowOnlyStartEndTimesState();
+
+                // Initialize tooltips for help icons
+                $('.ui-node-popover-title').tooltip({
+                    show: {
+                        effect: 'slideDown',
+                        delay: 150
+                    }
+                });
+                
+                // Initial validation run
+                validate()
+            },
+            oneditsave: function () {
+                const node = this; // Reference to the node
+  
+                // Clear existing states and repopulate from the editableList
+                node.states = []
+                const stateRows = $('#node-input-states-container').editableList('items')
+                stateRows.each(function (i) {
+                    const stateRow = $(this)
+                    const label = stateRow.find('.node-input-state-label').val()
+                    // Icon find removed
+                    const value = stateRow.find('.node-input-state-value').typedInput('value')
+                    const valueType = stateRow.find('.node-input-state-value').typedInput('type')
+                    const color = stateRow.find('.node-input-state-color').val()
+  
+                    // Push the state object (without icon) to the node's states array
+                    node.states.push({ label, value, valueType, color })
+                })
+                // Save the liveUpdate checkbox value
+                node.liveUpdate = $('#node-input-liveUpdate').is(':checked');
+                // Save the range limit values
+                node.rangeLimit = parseInt($('#node-input-rangeLimit').val(), 10) || 24;
+                node.rangeLimitUnit = $('#node-input-rangeLimitUnit').val() || '3600';
+                // Save time marker options
+                node.showTimeMarkers = $('#node-input-showTimeMarkers').is(':checked');
+                node.showOnlyStartEndTimes = $('#node-input-showOnlyStartEndTimes').is(':checked');
+                // No extra validation needed here as oneditprepare handles it live,
+                // and the default 'states.validate' handles final check.
+            }
+        })
+    })()
+  </script>
+  
+  <script type="text/html" data-template-name="ui-state-timeline">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="ui-state-timeline.label.name">Name</span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]ui-state-timeline.label.name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-group"><i class="fa fa-table"></i> <span data-i18n="ui-state-timeline.label.group">Group</span></label>
+        <input type="text" id="node-input-group">
+    </div>
+    <div class="form-row nr-db-ui-element-sizer-row">
+        <label><i class="fa fa-object-group"></i> <span data-i18n="ui-state-timeline.label.size">Size</span></label>
+        <button class="editor-button" id="node-input-size"></button>
+    </div>
+    <div class="form-row nr-db-ui-manual-size-row" style="display: none;">
+        <label><i class="fa fa-arrows-h"></i> <span data-i18n="ui-state-timeline.label.width">Width</span></label>
+        <input type="hidden" id="node-input-width">
+    </div>
+    <div class="form-row nr-db-ui-manual-size-row" style="display: none;">
+        <label><i class="fa fa-arrows-v"></i> <span data-i18n="ui-state-timeline.label.height">Height</span></label>
+        <input type="hidden" id="node-input-height">
+    </div>
+    <div class="form-row">
+        <label for="node-input-label"><i class="fa fa-i-cursor"></i> <span data-i18n="ui-state-timeline.label.label">Label</span></label>
+        <input type="text" id="node-input-label" data-i18n="[placeholder]ui-state-timeline.label.label">
+    </div>
+    <div class="form-row">
+        <label for="node-input-barHeight"><i class="fa fa-arrows-v"></i> <span data-i18n="ui-state-timeline.label.barHeight">Bar Height</span></label>
+        <input type="number" id="node-input-barHeight" placeholder="30">
+    </div>
+  
+    <div class="form-row" style="margin-bottom:0;">
+        <label><i class="fa fa-list"></i> <span data-i18n="ui-state-timeline.label.states">States</span>:</label> <span id="configError" style="color:#DD0000; display: none;"></span>
+    </div>
+    <div class="form-row">
+        <ol id="node-input-states-container"></ol>
+    </div>
+  
+    <div class="form-row">
+        <label for="node-input-timeFormat">
+            <i class="fa fa-clock-o"></i>
+            <span data-i18n="ui-state-timeline.label.timeFormat">Time Format</span>
+            <a
+                data-html="true"
+                class="red-ui-button ui-node-popover-title"
+                style="margin-left: 4px; cursor: help; font-size: 0.625rem; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center;"
+                tabindex="0"
+                data-i18n="[title]ui-state-timeline.help.timeFormat"
+            >
+                <i class="fa fa-question"></i>
+            </a>
+        </label>
+        <input type="text" id="node-input-timeFormat" placeholder="e.g., hh:mm a">
+    </div>
+    <div class="form-row">
+        <label for="node-input-minTimeLabelGap"><i class="fa fa-arrows-h"></i> <span data-i18n="ui-state-timeline.label.minTimeLabelGap">Min Label Gap (%)</span></label>
+        <input type="number" id="node-input-minTimeLabelGap" placeholder="6">
+    </div>
+    <div class="form-row" id="timeline-range-row">
+        <label for="node-input-rangeLimit"><i class="fa fa-clock-o"></i> <span data-i18n="ui-state-timeline.label.rangeLimit">Time Range Limit</span></label>
+        <input type="number" id="node-input-rangeLimit" style="width:60px;" min="1" placeholder="24">
+        <select id="node-input-rangeLimitUnit" style="width:100px;">
+            <option value="1" data-i18n="ui-state-timeline.option.seconds">Seconds</option>
+            <option value="60" data-i18n="ui-state-timeline.option.minutes">Minutes</option>
+            <option value="3600" data-i18n="ui-state-timeline.option.hours" selected>Hours</option>
+            <option value="86400" data-i18n="ui-state-timeline.option.days">Days</option>
+            <option value="604800" data-i18n="ui-state-timeline.option.weeks">Weeks</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-liveUpdate"><i class="fa fa-refresh"></i> <span data-i18n="ui-state-timeline.label.liveUpdate">Live Update</span></label>
+        <input type="checkbox" id="node-input-liveUpdate" style="width:auto;vertical-align:middle;">
+        <span style="font-size: 0.9em; color: #888;" data-i18n="ui-state-timeline.tip.liveUpdate">Update last segment end time every 5 seconds</span>
+    </div>
+    <div class="form-row">
+        <label for="node-input-showTimeMarkers"><i class="fa fa-clock-o"></i> <span data-i18n="ui-state-timeline.label.showTimeMarkers">Show time markers</span></label>
+        <input type="checkbox" id="node-input-showTimeMarkers" style="width:auto;vertical-align:middle;">
+    </div>
+    <div class="form-row">
+        <label for="node-input-showOnlyStartEndTimes"><i class="fa fa-dot-circle-o"></i> <span data-i18n="ui-state-timeline.label.showOnlyStartEndTimes">Show only start and end times</span></label>
+        <input type="checkbox" id="node-input-showOnlyStartEndTimes" style="width:auto;vertical-align:middle;">
+        <span style="font-size: 0.9em; color: #888;" data-i18n="ui-state-timeline.tip.showOnlyStartEndTimes">Only show time at start and end of timeline bar</span>
+    </div>
+  </script>

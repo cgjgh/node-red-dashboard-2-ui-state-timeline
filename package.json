@@ -1,0 +1,89 @@
+{
+  "name": "@cgjgh/node-red-dashboard-2-ui-state-timeline",
+  "version": "3.3.4",
+  "description": "",
+  "keywords": [
+    "node-red",
+    "node-red-dashboard-2"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cgjgh/node-red-dashboard-2-ui-state-timeline.git"
+  },
+  "license": "Apache-2.0",
+  "exports": {
+    "import": "./resources/ui-state-timeline.esm.js",
+    "require": "./resources/ui-state-timeline.umd.js"
+  },
+  "files": [
+    "nodes/*",
+    "ui/*",
+    "resources/*",
+    "examples/*"
+  ],
+  "scripts": {
+    "build": "npm run add-package-info && vite build",
+    "build:dev": " cross-env NODE_ENV=development vite build --mode development",
+    "dev": "cross-env NODE_ENV=development vite build --mode development --watch",
+    "dev:prod": "vite build --watch",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "cy:server": "node-red -u ./cypress/fixtures/user-dir/ -p 1881",
+    "add-package-info": "node ./scripts/addPackageInfo.js ./package.json ./nodes/ui-state-timeline.js",
+    "lint": "npm run lint:js && npm run lint:package",
+    "lint:fix": "npm run lint:js:fix && npm run lint:package:fix",
+    "lint:js": "eslint --ext .js,.vue,.cjs,.mjs .",
+    "lint:js:fix": "yarn lint:js --fix",
+    "lint:package": "sort-package-json --check 'package.json'",
+    "lint:package:fix": "sort-package-json 'package.json'",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
+  },
+  "dependencies": {
+    "vue": "^3.4.5",
+    "vuex": "^4.1.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "cross-env": "^7.0.3",
+    "cypress": "^14.2.0",
+    "eslint": "^8.53.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-cypress": "^2.15.1",
+    "eslint-plugin-html": "^7.1.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-n": "^16.3.1",
+    "eslint-plugin-no-only-tests": "^3.1.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-vue": "^9.18.1",
+    "eslint-plugin-vuetify": "^2.4.0",
+    "node-red": "^4.0.9",
+    "vite": "^5.0.13",
+    "vite-plugin-css-injected-by-js": "^3.3.0",
+    "vite-plugin-static-copy": "^1.0.6",
+    "vitepress": "^1.6.3",
+    "vuetify": "^3.7.6"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "node-red": {
+    "version": ">=3.0.0",
+    "nodes": {
+      "ui-state-timeline": "nodes/ui-state-timeline.js"
+    }
+  },
+  "node-red-dashboard-2": {
+    "version": "1.0.0",
+    "widgets": {
+      "ui-state-timeline": {
+        "output": "ui-state-timeline.umd.js",
+        "component": "UIStateTimeline"
+      }
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

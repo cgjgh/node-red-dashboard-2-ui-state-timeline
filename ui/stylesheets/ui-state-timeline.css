@@ -1,0 +1,217 @@
+/* Scoped styles ensure they only apply to this component */
+.history-timeline {
+  position: relative;
+  /* Needed for absolute positioning of card and time markers */
+  min-height: 110px;
+  /* Ensure enough space for timeline, axis, legend, and card */
+  box-sizing: border-box;
+}
+
+.timeline-bar {
+  display: flex;
+  /* Arrange segments horizontally */
+  flex-direction: row;
+  width: 100%;
+  /* Take full container width */
+  cursor: default;
+  /* Default cursor for the bar background */
+  align-items: center;
+  /* Vertically center segments if bar height > segment height */
+  /* overflow: hidden; */
+  /* Optional: Uncomment if bar itself should clip segment transforms */
+  /* border-radius: 6px; */
+  /* Optional: Uncomment if the bar itself needs rounded corners */
+}
+
+.timeline-segment {
+  height: 100%;
+  /* Segments take full height of the bar */
+  cursor: pointer;
+  /* Indicate segments are clickable */
+  box-sizing: border-box;
+  /* Include border/padding in width calculation */
+  /* Smooth transitions for visual feedback */
+  transition: box-shadow 0.2s ease, border 0.2s ease, transform 0.2s ease-in,
+      border-radius 0.2s ease-in;
+  transform-origin: center center;
+  /* Scale vertically from the center */
+  border-radius: 0;
+  /* Segments are square by default */
+}
+
+/* --- Rounded corners for the very first and very last segments --- */
+.timeline-segment:first-child {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+.timeline-segment:last-child {
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+/* --- Styles for hover (when not selected) and selected states --- */
+.timeline-segment:hover:not(.selected),
+/* Apply hover transform only if not selected */
+.timeline-segment.selected {
+  transform: scaleY(1.3);
+  /* Scale segment vertically */
+  z-index: 5;
+  /* Bring scaled segment above others */
+  /* Add rounded corners when scaled */
+  border-radius: 6px;
+}
+
+.timeline-segment:hover:not(.selected) {
+  /* Add shadow only on hover (when not selected) */
+  box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.6);
+}
+
+.timeline-segment.selected {
+  border: 2px solid #000;
+  /* Add a distinct border when selected */
+  box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.6);
+  /* Keep shadow when selected */
+  /* Ensure outer corners remain rounded when selected and scaled */
+}
+
+/* Explicitly keep outer rounding for selected first/last segments */
+.timeline-segment:first-child.selected {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+.timeline-segment:last-child.selected {
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+/* --- Style for the message when no data is available --- */
+.no-data {
+  text-align: center;
+  color: #888;
+  /* Grey text */
+  padding: 20px;
+  /* Add some padding */
+  font-style: italic;
+}
+
+/* --- Time Axis Styles --- */
+.time-axis {
+  position: relative;
+  /* Container for absolutely positioned markers */
+  width: 100%;
+  height: 20px;
+  /* Height allocated for the labels */
+  margin-top: 8px;
+  /* Space between timeline bar and time labels */
+  overflow: visible;
+  /* Allow labels to be positioned correctly */
+  user-select: none;
+  /* Prevent accidental text selection of labels */
+}
+
+.time-marker {
+  position: absolute;
+  bottom: 0;
+  /* Align labels to the bottom of the axis */
+  transform: translateX(-50%);
+  /* Center the label text horizontally on its position */
+  font-size: 10px;
+  /* Make labels small */
+  color: #555;
+  /* Dark grey color for labels */
+  white-space: nowrap;
+
+  /* Prevent labels from wrapping */
+  /* Optional: Add a tick mark above the text */
+  &::before {
+      content: '';
+      position: absolute;
+      bottom: calc(100% + 1px);
+      /* Position above the text */
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1px;
+      height: 4px;
+      /* Height of the tick */
+      background-color: #aaa;
+      /* Tick color */
+  }
+}
+
+.ui-state-timeline {
+  display: flex;
+  align-items: center;
+  /* Align items vertically in the center */
+  justify-content: space-between;
+  /* Distribute items evenly with space between */
+}
+
+/* --- Legend Styles --- */
+
+.legend {
+  margin-top: 15px;
+  /* Space above legend */
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 0 10px;
+  /* Padding for legend items */
+  gap: 10px;
+  /* Gap between legend items */
+}
+
+.legend-item {
+  /* margin: 0 10px 5px 0; removed in favor of gap */
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.8rem;
+  color: #333;
+  /* Slightly darker text */
+}
+
+.color-box {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 5px;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  /* Subtle border */
+}
+
+/* --- Details Card Styles --- */
+.details-card {
+  /* Most styles are applied via :style binding for positioning */
+  /* Add specific styles here if needed, e.g., max-width, min-width */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  /* Add shadow for elevation */
+}
+
+/* Style Vuetify list items within the card for compactness */
+.details-card .v-list-item {
+  min-height: 28px;
+  /* Reduce default height */
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.details-card .v-list-item-title,
+.details-card .v-list-item-subtitle {
+  line-height: 1.3;
+  /* Adjust line height for better readability */
+}
+
+.details-card .v-card-title {
+  font-weight: bold;
+  /* Make state name bold */
+}
+
+.nrdb-ui-state-timeline-title {
+  display: block;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1rem;
+  padding-bottom: 4px;
+}
