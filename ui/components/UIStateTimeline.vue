@@ -7,7 +7,14 @@
                 <div class="legend">
                     <span v-for="stateValue in uniqueStates" :key="stateValue" class="legend-item">
                         <span class="color-box" :style="{ backgroundColor: getColor(stateValue) }" />
-                        {{ getStateLabel(stateValue) }}
+                        <span
+                            :style="{
+                                color: `var(--v-theme-on-group-background)`,
+                                opacity: 0.5 // or any value less than 1 for more gray
+                            }"
+                        >
+                            {{ getStateLabel(stateValue) }}
+                        </span>
                     </span>
                 </div>
             </div>
@@ -27,14 +34,21 @@
 
             <div v-if="stateData.length > 0 && showTimeMarkers" class="time-axis">
                 <span
-                    v-for="(marker, index) in filteredTimeMarkers" :key="index" class="time-marker"
-                    :style="{ left: marker.position + '%' }"
+                    v-for="(marker, index) in filteredTimeMarkers"
+                    :key="index"
+                    class="time-marker"
+                    :style="{
+                        left: marker.position + '%',
+                        color: `var(--v-theme-on-group-background)`,
+                        borderColor: `var(--v-theme-on-group-background)`,
+                        opacity: 0.5 // or any value less than 1 for more gray
+                    }"
                 >
                     {{ marker.label }}
                 </span>
             </div>
 
-            <v-card v-if="displaySegment" ref="detailsCard" class="pa-2 details-card" :style="cardStyle" elevation="4">
+            <v-card v-if="displaySegment" ref="detailsCard" class="pa-2 details-card" :style="cardStyle">
                 <v-card-title class="text-caption pa-1">
                     {{ getStateLabel(displaySegment.state) }}
                 </v-card-title>
@@ -55,8 +69,7 @@
                         <v-list-item>
                             <v-list-item-title class="text-caption">Duration:</v-list-item-title>
                             <v-list-item-subtitle class="text-body-2">
-                                {{ Math.round((new Date(displaySegment.end) - new Date(displaySegment.start)) / 1000 /
-                                    60) }} minutes
+                                {{ formattedDuration }}
                             </v-list-item-subtitle>
                         </v-list-item>
                     </v-list>
@@ -137,12 +150,31 @@ export default {
         displaySegment () {
             return this.selectedSegment || this.hoveredSegment
         },
+        formattedDuration () {
+            if (!this.displaySegment) return ''
+
+            const start = new Date(this.displaySegment.start)
+            const end = new Date(this.displaySegment.end)
+            const totalMinutes = Math.round((end - start) / 1000 / 60)
+
+            if (totalMinutes > 59) {
+                const hours = Math.floor(totalMinutes / 60)
+                const minutes = totalMinutes % 60
+                let result = `${hours} hour${hours > 1 ? 's' : ''}`
+                if (minutes > 0) {
+                    result += ` ${minutes} minute${minutes > 1 ? 's' : ''}`
+                }
+                return result
+            } else {
+                return `${totalMinutes} minute${totalMinutes !== 1 ? 's' : ''}`
+            }
+        },
         cardStyle () {
             return {
                 position: 'absolute',
                 top: `${this.cardTop}px`,
                 left: `${this.cardLeft}px`,
-                zIndex: 10,
+                zIndex: 24,
                 width: '200px'
             }
         },
@@ -256,6 +288,12 @@ export default {
         // Setup remains the same
         this.$dataTracker(this.id, this.onInput, null, this.onDynamicProperty, null)
         this.$socket.emit('widget-load', this.id)
+    },
+    mounted () {
+        document.addEventListener('mousedown', this.handleClickOutside)
+    },
+    beforeUnmount () {
+        document.removeEventListener('mousedown', this.handleClickOutside)
     },
     methods: {
         onInput (msg) {
@@ -371,6 +409,15 @@ export default {
         onTimelineClick (event) {
             // If click is directly on the bar background (not a segment), deselect
             if (event.target === this.$refs.timelineBar) {
+                this.selectedSegment = null
+                this.hoveredSegment = null
+            }
+        },
+        handleClickOutside (event) {
+            if (!this.$refs.detailsCard) return
+            const card = this.$refs.detailsCard.$el || this.$refs.detailsCard
+            if (this.displaySegment && card && !card.contains(event.target) &&
+                !event.target.classList.contains('timeline-segment')) {
                 this.selectedSegment = null
                 this.hoveredSegment = null
             }

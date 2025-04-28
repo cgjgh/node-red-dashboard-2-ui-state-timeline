@@ -119,8 +119,6 @@
   /* Center the label text horizontally on its position */
   font-size: 10px;
   /* Make labels small */
-  color: #555;
-  /* Dark grey color for labels */
   white-space: nowrap;
 
   /* Prevent labels from wrapping */
@@ -167,8 +165,6 @@
   display: inline-flex;
   align-items: center;
   font-size: 0.8rem;
-  color: #333;
-  /* Slightly darker text */
 }
 
 .color-box {
