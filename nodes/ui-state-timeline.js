@@ -63,6 +63,11 @@ module.exports = function (RED) {
             text: 'none'
         })
 
+        // loop over the options and ensure we've got the correct types for each option
+        config.states.forEach(state => {
+            state.value = RED.util.evaluateNodeProperty(state.value, state.valueType, node)
+        })
+
         const allowedStates = (config.states || []).map(state => state.value)
 
         // Retrieve the dashboard group
@@ -190,7 +195,7 @@ module.exports = function (RED) {
                             state: segment.state
                         }))
                     }
-                } else if (typeof payload === 'object' && payload.time != null && payload.state) {
+                } else if (typeof payload === 'object' && payload.time !== null && payload.state !== null) {
                     // Single state input: {"time": number, "state": string}
                     processSingleInput(payload)
                     // Remove old segments from memory
@@ -221,7 +226,7 @@ module.exports = function (RED) {
                 let stateColor = 'grey' // default
                 let stateText = 'none'
 
-                if (currentState && currentState.state) {
+                if (currentState && currentState.state !== null) {
                     // Try to find the color from the states config if available
                     const stateConfig = (config.states || []).find(s => s.value === currentState.state)
                     const hexColor = stateConfig && stateConfig.color ? stateConfig.color : '#009933' // fallback to green
