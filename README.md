@@ -1,7 +1,7 @@
 
 # State Timeline Node for Node-RED Dashboard 2.0
 
-This repository provides a **State Timeline** node for [Node-RED Dashboard 2.0](https://github.com/flowfuse/node-red-dashboard). The State Timeline node visualizes the history of state changes over time, making it easy to track and analyze how a device, process, or variable has changed states throughout a given period.
+The State Timeline node visualizes the history of state changes over time, making it easy to track and analyze how a device, process, or variable has changed states throughout a given period.
 
 ## 🚦 What is the State Timeline Node?
 
