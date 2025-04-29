@@ -1,13 +1,6 @@
 
 # State Timeline Node for Node-RED Dashboard 2.0
 
-[![GitHub Stars](https://img.shields.io/github/stars/cgjgh/node-red-dashboard-2-ui-state-timeline?style=social)](https://github.com/cgjgh/node-red-dashboard-2-ui-state-timeline/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/cgjgh/node-red-dashboard-2-ui-state-timeline?style=social)](https://github.com/cgjgh/node-red-dashboard-2-ui-state-timeline/fork)
-[![GitHub Issues](https://img.shields.io/github/issues/cgjgh/node-red-dashboard-2-ui-state-timeline)](https://github.com/cgjgh/node-red-dashboard-2-ui-state-timeline/issues)
-[![GitHub License](https://img.shields.io/github/license/cgjgh/node-red-dashboard-2-ui-state-timeline)](https://github.com/cgjgh/node-red-dashboard-2-ui-state-timeline/blob/main/LICENSE)
-
----
-
 This repository provides a **State Timeline** node for [Node-RED Dashboard 2.0](https://github.com/flowfuse/node-red-dashboard). The State Timeline node visualizes the history of state changes over time, making it easy to track and analyze how a device, process, or variable has changed states throughout a given period.
 
 ## 🚦 What is the State Timeline Node?
