@@ -1,72 +1,164 @@
-# Scheduler Node for Node-RED Dashboard
 
-<div style="display: flex; justify-content: center; align-items: center;">
+# State Timeline Node for Node-RED Dashboard 2.0
 
-<img src="https://img.shields.io/github/stars/cgjgh/node-red-dashboard-2-ui-state-timeline?style=social" alt="GitHub Stars"/>
-<img src="https://img.shields.io/github/forks/cgjgh/node-red-dashboard-2-ui-state-timeline?style=social" alt="GitHub Forks"/>
-<img src="https://img.shields.io/github/issues/cgjgh/node-red-dashboard-2-ui-state-timeline" alt="GitHub Issues"/>
-<img src="https://img.shields.io/github/license/cgjgh/node-red-dashboard-2-ui-state-timeline" alt="GitHub License"/>
-</div>
-<br/>
-This repository contains a Scheduler Node for Node-RED Dashboard 2.0. This node allows you to schedule the injection of payloads from dashboard UI to start flows at specified times or intervals.
+[![GitHub Stars](https://img.shields.io/github/stars/cgjgh/node-red-dashboard-2-ui-state-timeline?style=social)](https://github.com/cgjgh/node-red-dashboard-2-ui-state-timeline/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/cgjgh/node-red-dashboard-2-ui-state-timeline?style=social)](https://github.com/cgjgh/node-red-dashboard-2-ui-state-timeline/fork)
+[![GitHub Issues](https://img.shields.io/github/issues/cgjgh/node-red-dashboard-2-ui-state-timeline)](https://github.com/cgjgh/node-red-dashboard-2-ui-state-timeline/issues)
+[![GitHub License](https://img.shields.io/github/license/cgjgh/node-red-dashboard-2-ui-state-timeline)](https://github.com/cgjgh/node-red-dashboard-2-ui-state-timeline/blob/main/LICENSE)
 
-## Important Note
-This node is still in beta and is not yet ready for production use. Any contribution or feedback is welcome.
+---
 
-## Features
+This repository provides a **State Timeline** node for [Node-RED Dashboard 2.0](https://github.com/flowfuse/node-red-dashboard). The State Timeline node visualizes the history of state changes over time, making it easy to track and analyze how a device, process, or variable has changed states throughout a given period.
 
-- 🔌 **Integration with Node-RED Dashboard 2.0:** UI-based schedule management made effortless.
-- ⏰ **Flexible Scheduling:** Define events by minute, hour, day, week, month, or yearly periods.
-- 🌅 **Solar Events Support:** Incorporate natural cues like sunrise and sunset.
-- 📝 **Cron Expressions & Builder:** Specify schedules seamlessly with cron expressions using the intuitive UI cron builder.
-- 💾 **Persistent Storage:** Save schedules to your local file system or Node-RED context stores for reliability.
-- ⏳ **Timespan & Duration Options:** Easily set timespans (e.g., from 10:00 AM to 12:00 PM) and durations (e.g., for 5 minutes).
-- 🌞 **Solar with Time Integration:** Mix solar events with traditional time schedules (e.g., from 5:00 AM to Sunrise) for dynamic scheduling.
-- 🔄 **Wrap-Around Schedules:** Support schedules that span across days (e.g., from 9:00 PM to 7:00 AM).
-- 📡 **State Updates:** Optionally broadcast the current status of timespan or duration schedules at set intervals.
-- 📦 **Custom Payloads:** Attach custom payloads to your schedules for tailored automation.
-- 🌐 **Multi-Language Translations:** Available in multiple languages:
-  - 🇬🇧 English
-  - 🇩🇪 Deutsch
-  - 🇫🇷 Français
-  - 🇮🇹 Italiano
-  - 🇳🇱 Nederlands
-  - 🇪🇸 Español
+## 🚦 What is the State Timeline Node?
+
+The State Timeline node displays a horizontal timeline bar in your Dashboard, where each segment represents a period during which a particular state was active. It is ideal for visualizing on/off cycles, process states, sensor readings, or any discrete state transitions.
 
 ![Overview](https://github.com/cgjgh/node-red-dashboard-2-ui-state-timeline/blob/40658aef518f54a6068e5eb9bfc79029e86b4c16/assets/overview.png?raw=true)
 
-<div style="display: flex; justify-content: space-evenly;">
-  <img src="https://github.com/cgjgh/node-red-dashboard-2-ui-state-timeline/blob/40658aef518f54a6068e5eb9bfc79029e86b4c16/assets/details.png?raw=true" alt="Details" style="width: 45%!important; margin: 0 10px;"/>
-  <img src="https://github.com/cgjgh/node-red-dashboard-2-ui-state-timeline/blob/40658aef518f54a6068e5eb9bfc79029e86b4c16/assets/newSchedule.gif?raw=true" alt="Adding New Schedule" style="width: 45%!important; margin: 0 10px;"/>
-</div>
+---
 
+## ✨ Features
 
-## 📦Installation
+- **Visual State History:** See a clear, color-coded timeline of state changes.
+- **Customizable States:** Define your own states, labels, and colors.
+- **Flexible Time Range:** Limit the displayed history to a configurable window (e.g., last 24 hours).
+- **Live Updates:** Optionally update the end time of the current state segment in real time.
+- **Time Markers:** Show time labels at segment boundaries or only at the start/end.
+- **Detailed Tooltips:** Hover over segments to see start/end times and durations.
+- **Dashboard Integration:** Seamless integration with Node-RED Dashboard 2.0.
+- **Persistent State:** Timeline history is preserved across Node-RED restarts.
+- **Multi-language Support:** UI labels and configuration support multiple languages.
 
-You can install this node directly from the "Manage Palette" menu in the Node-RED interface.
+---
 
-Alternatively, run the following command in your Node-RED user directory - typically `~/.node-red` on Linux or `%HOMEPATH%\.nodered` on Windows:
+## 📦 Installation
 
-    npm install @cgjgh/node-red-dashboard-2-ui-state-timeline
+You can install this node directly from the **Manage Palette** menu in Node-RED.
 
-## 🤝 Support my Node-RED Dashboard development
-Finding this useful? By supporting my Node-RED Dashboard development, you’ll help drive new features, enhancements, and updates. Your encouragement means everything—thank you for considering!
+Or, from your Node-RED user directory (typically `~/.node-red`):
 
-<a href="https://www.buymeacoffee.com/cgjgh" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/arial-blue.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+```sh
+npm install @cgjgh/node-red-dashboard-2-ui-state-timeline
+```
 
-## 💡Usage
+---
 
-- Add a scheduler node to your flow.
-- Open the node's configuration dialog and optionally configure the timezone, location from map, and persistence options.
-- Open the dashboard and you will see an empty scheduler. 
-- Click the plus sign at the top right corner of the node to create a new schedule.
+## 🛠️ Node Configuration
 
-## 🌐 Setting Language
- - Edit <code>~/.node-red/settings.js</code> and add/uncomment the following line: <code>lang: 'en'</code> Available languages codes are: <code>en</code>, <code>de</code>, <code>fr</code>, <code>it</code>, <code>nl</code>, <code>es</code>
- - Open the node's configuration dialog and set the desired language for scheduler in the Dashboard 2.0 UI
+### Node Properties
+
+- **Group:** Dashboard group to display the timeline in (required).
+- **Name:** Optional name for the node.
+- **Label:** Title shown above the timeline bar.
+- **Bar Height:** Height of the timeline bar (in pixels).
+- **States:** Define the possible states, each with:
+  - **Label:** Human-readable name.
+  - **Value:** The value to match in incoming messages.
+  - **Type:** Data type (`str`, `num`, `bool`, `json`).
+  - **Color:** Color for the timeline segment.
+- **Time Format:** Format for time labels (e.g., `h:mm A`, `HH:mm`).
+- **Min Label Gap (%):** Minimum percentage gap between time labels.
+- **Time Range Limit:** How much history to display (e.g., 24).
+- **Time Range Unit:** Unit for the range (seconds, minutes, hours, days, weeks).
+- **Live Update:** If enabled, the current segment's end time updates every 5 seconds.
+- **Show Time Markers:** Show time labels at segment boundaries.
+- **Show Only Start/End Times:** Only show time at the start and end of the timeline.
+
+### Example Configuration UI
+
+![Details](https://github.com/cgjgh/node-red-dashboard-2-ui-state-timeline/blob/40658aef518f54a6068e5eb9bfc79029e86b4c16/assets/details.png?raw=true)
+
+---
+
+## 🔗 Usage
+
+1. **Add the node** to your flow and connect it to the data source whose state you want to visualize.
+2. **Configure the states** you want to track (e.g., On/Off, Open/Closed, etc.).
+3. **Send messages** to the node with the following payload formats:
+
+### Input Message Formats
+
+#### Single State Change
+
+```json
+{
+  "payload": {
+    "time": 1710000000000,   // Unix timestamp in milliseconds
+    "state": "on"            // Value matching one of your configured states
+  }
+}
+```
+
+#### Array of State Changes
+
+```json
+{
+  "payload": [
+    { "time": 1710000000000, "state": "on" },
+    { "time": 1710003600000, "state": "off" },
+    { "time": 1710007200000, "state": "on" }
+  ]
+}
+```
+
+- The node will build the timeline from the provided state changes.
+- Timestamps must be in milliseconds (JavaScript Date format).
+
+### Output
+
+- The node outputs the current timeline as:
+  ```json
+  {
+    "payload": {
+      "stateData": [
+        { "start": "2024-03-09T10:00:00.000Z", "end": "2024-03-09T11:00:00.000Z", "state": "on" },
+        ...
+      ]
+    }
+  }
+  ```
+- This can be used for further processing or logging.
+
+---
+
+## 🖥️ Dashboard Display
+
+- Each state is shown as a colored segment.
+- Hovering over a segment shows a tooltip with:
+  - State label
+  - Start time
+  - End time
+  - Duration
+- Time markers are shown according to your configuration.
+
+![Adding New Schedule](https://github.com/cgjgh/node-red-dashboard-2-ui-state-timeline/blob/40658aef518f54a6068e5eb9bfc79029e86b4c16/assets/newSchedule.gif?raw=true)
+
+---
+
+## 🧑‍💻 Development & Contributions
+
+- This node is under active development. Feedback and contributions are welcome!
+- Please open issues or pull requests on [GitHub](https://github.com/cgjgh/node-red-dashboard-2-ui-state-timeline).
+
+---
 
 ## 🙏 Acknowledgements
 
-Inspired by: [node-red-contrib-ui-time-scheduler](https://flows.nodered.org/node/node-red-contrib-ui-time-scheduler)
+- Inspired by [node-red-contrib-ui-time-scheduler](https://flows.nodered.org/node/node-red-contrib-ui-time-scheduler)
+- Thanks to [node-red-contrib-cron-plus](https://flows.nodered.org/node/node-red-contrib-cron-plus) by [Steve-Mcl](https://github.com/Steve-Mcl) for inspiration.
 
-This node draws heavily on the work of [node-red-contrib-cron-plus](https://flows.nodered.org/node/node-red-contrib-cron-plus) by [Steve-Mcl](https://github.com/Steve-Mcl). Tremendous thanks for the outstanding work on this.
+---
+
+## ☕ Support
+
+If you find this node useful, please consider supporting development:
+
+[![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/v2/arial-blue.png)](https://www.buymeacoffee.com/cgjgh)
+
+---
+
+## 📚 License
+
+[Apache-2.0](LICENSE)
+
