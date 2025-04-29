@@ -72,13 +72,18 @@ npm install @cgjgh/node-red-dashboard-2-ui-state-timeline
 
 ### Input Message Formats
 
+#### Payload Field Explanations
+
+- `time`: Unix timestamp in milliseconds (e.g., `1710000000000`)
+- `state`: Value matching one of your configured states (e.g., `"on"`)
+
 #### Single State Change
 
 ```json
 {
   "payload": {
-    "time": 1710000000000,   // Unix timestamp in milliseconds
-    "state": "on"            // Value matching one of your configured states
+    "time": 1710000000000,
+    "state": "on"
   }
 }
 ```
@@ -105,8 +110,7 @@ npm install @cgjgh/node-red-dashboard-2-ui-state-timeline
   {
     "payload": {
       "stateData": [
-        { "start": "2024-03-09T10:00:00.000Z", "end": "2024-03-09T11:00:00.000Z", "state": "on" },
-        ...
+        { "start": "2024-03-09T10:00:00.000Z", "end": "2024-03-09T11:00:00.000Z", "state": "on" }
       ]
     }
   }
