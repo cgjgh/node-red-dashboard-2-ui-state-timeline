@@ -1,6 +1,6 @@
 {
   "name": "@cgjgh/node-red-dashboard-2-ui-state-timeline",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "keywords": [
     "node-red",
@@ -22,14 +22,13 @@
     "examples/*"
   ],
   "scripts": {
-    "build": "npm run add-package-info && vite build",
+    "build": "vite build",
     "build:dev": " cross-env NODE_ENV=development vite build --mode development",
     "dev": "cross-env NODE_ENV=development vite build --mode development --watch",
     "dev:prod": "vite build --watch",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
     "cy:server": "node-red -u ./cypress/fixtures/user-dir/ -p 1881",
-    "add-package-info": "node ./scripts/addPackageInfo.js ./package.json ./nodes/ui-state-timeline.js",
     "lint": "npm run lint:js && npm run lint:package",
     "lint:fix": "npm run lint:js:fix && npm run lint:package:fix",
     "lint:js": "eslint --ext .js,.vue,.cjs,.mjs .",
