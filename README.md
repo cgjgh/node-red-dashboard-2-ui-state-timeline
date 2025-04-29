@@ -7,7 +7,7 @@ This repository provides a **State Timeline** node for [Node-RED Dashboard 2.0](
 
 The State Timeline node displays a horizontal timeline bar in your Dashboard, where each segment represents a period during which a particular state was active. It is ideal for visualizing on/off cycles, process states, sensor readings, or any discrete state transitions.
 
-![Overview](https://github.com/cgjgh/node-red-dashboard-2-ui-state-timeline/blob/40658aef518f54a6068e5eb9bfc79029e86b4c16/assets/overview.png?raw=true)
+![Overview](https://github.com/cgjgh/node-red-dashboard-2-ui-state-timeline/blob/5c19b8da00e14db20e22d2ac63d9cc55127cefd5/assets/overview.png?raw=true)
 
 ---
 
@@ -58,9 +58,9 @@ npm install @cgjgh/node-red-dashboard-2-ui-state-timeline
 - **Show Time Markers:** Show time labels at segment boundaries.
 - **Show Only Start/End Times:** Only show time at the start and end of the timeline.
 
-### Example Configuration UI
+### Example UI
 
-![Details](https://github.com/cgjgh/node-red-dashboard-2-ui-state-timeline/blob/40658aef518f54a6068e5eb9bfc79029e86b4c16/assets/details.png?raw=true)
+![Details](https://github.com/cgjgh/node-red-dashboard-2-ui-state-timeline/blob/5c19b8da00e14db20e22d2ac63d9cc55127cefd5/assets/details.gif?raw=true)
 
 ---
 
