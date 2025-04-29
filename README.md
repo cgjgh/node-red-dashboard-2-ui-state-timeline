@@ -124,22 +124,13 @@ npm install @cgjgh/node-red-dashboard-2-ui-state-timeline
   - End time
   - Duration
 - Time markers are shown according to your configuration.
-
-![Adding New Schedule](https://github.com/cgjgh/node-red-dashboard-2-ui-state-timeline/blob/40658aef518f54a6068e5eb9bfc79029e86b4c16/assets/newSchedule.gif?raw=true)
-
+- 
 ---
 
 ## 🧑‍💻 Development & Contributions
 
 - This node is under active development. Feedback and contributions are welcome!
 - Please open issues or pull requests on [GitHub](https://github.com/cgjgh/node-red-dashboard-2-ui-state-timeline).
-
----
-
-## 🙏 Acknowledgements
-
-- Inspired by [node-red-contrib-ui-time-scheduler](https://flows.nodered.org/node/node-red-contrib-ui-time-scheduler)
-- Thanks to [node-red-contrib-cron-plus](https://flows.nodered.org/node/node-red-contrib-cron-plus) by [Steve-Mcl](https://github.com/Steve-Mcl) for inspiration.
 
 ---
 
