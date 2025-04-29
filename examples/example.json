@@ -1,0 +1,296 @@
+[
+    {
+        "id": "2af30d41037b7c12",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "80d2e762b97bdcfa",
+        "type": "ui-state-timeline",
+        "z": "2af30d41037b7c12",
+        "group": "2a4951f74f962305",
+        "name": "",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "label": "State History",
+        "barHeight": "",
+        "states": [
+            {
+                "label": "On",
+                "value": "on",
+                "valueType": "str",
+                "color": "#009933"
+            },
+            {
+                "label": "Off",
+                "value": "off",
+                "valueType": "str",
+                "color": "#ff0000"
+            },
+            {
+                "label": "Error",
+                "value": "error",
+                "valueType": "str",
+                "color": "#ffa200"
+            }
+        ],
+        "timeFormat": "h:mm A",
+        "minTimeLabelGap": 6,
+        "liveUpdate": true,
+        "rangeLimit": 24,
+        "rangeLimitUnit": "3600",
+        "showTimeMarkers": true,
+        "showOnlyStartEndTimes": false,
+        "x": 570,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "89964bf4250fdbc6",
+        "type": "inject",
+        "z": "2af30d41037b7c12",
+        "name": "On",
+        "props": [
+            {
+                "p": "payload.time",
+                "v": "",
+                "vt": "date"
+            },
+            {
+                "p": "payload.state",
+                "v": "on",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 250,
+        "y": 180,
+        "wires": [
+            [
+                "80d2e762b97bdcfa"
+            ]
+        ]
+    },
+    {
+        "id": "a016152f26a58ff0",
+        "type": "inject",
+        "z": "2af30d41037b7c12",
+        "name": "Off",
+        "props": [
+            {
+                "p": "payload.time",
+                "v": "",
+                "vt": "date"
+            },
+            {
+                "p": "payload.state",
+                "v": "off",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 250,
+        "y": 240,
+        "wires": [
+            [
+                "80d2e762b97bdcfa"
+            ]
+        ]
+    },
+    {
+        "id": "d9e1aa8950e3df39",
+        "type": "inject",
+        "z": "2af30d41037b7c12",
+        "name": "Error",
+        "props": [
+            {
+                "p": "payload.time",
+                "v": "",
+                "vt": "date"
+            },
+            {
+                "p": "payload.state",
+                "v": "error",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 250,
+        "y": 300,
+        "wires": [
+            [
+                "80d2e762b97bdcfa"
+            ]
+        ]
+    },
+    {
+        "id": "da3e6819a8b0a5b2",
+        "type": "function",
+        "z": "2af30d41037b7c12",
+        "name": "Generate States Array",
+        "func": "// Example allowed states (customize as needed)\nconst allowedStates = ['on', 'off', 'error'];\n\n// Generate a random integer between min and max (inclusive)\nfunction randomInt(min, max) {\n    return Math.floor(Math.random() * (max - min + 1)) + min;\n}\n\n// Generate a random state from allowedStates\nfunction randomState() {\n    return allowedStates[randomInt(0, allowedStates.length - 1)];\n}\n\n// Generate a random array of {time, state} objects within the last 24 hours\nfunction generateRandomArray(count) {\n    const now = Date.now();\n    const msIn24h = 24 * 60 * 60 * 1000;\n    // Generate random start time within last 24 hours\n    let startTime = now - randomInt(0, msIn24h);\n\n    let arr = [];\n    let currentTime = startTime;\n    let lastState = null;\n    for (let i = 0; i < count; i++) {\n        // Ensure state changes sometimes\n        let state;\n        do {\n            state = randomState();\n        } while (state === lastState && Math.random() < 0.5); // 50% chance to change state\n\n        arr.push({\n            time: currentTime,\n            state: state\n        });\n        lastState = state;\n        // Increment time randomly, but don't go past 'now'\n        let nextStep = randomInt(1, Math.floor(msIn24h / count));\n        currentTime = Math.min(currentTime + nextStep, now);\n    }\n    return arr;\n}\n\n// Parameters for random data\nconst count = randomInt(5, 10); // Number of entries\n\nmsg.payload = generateRandomArray(count);\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 280,
+        "y": 380,
+        "wires": [
+            [
+                "80d2e762b97bdcfa"
+            ]
+        ]
+    },
+    {
+        "id": "9f98ee9e5a09d64e",
+        "type": "inject",
+        "z": "2af30d41037b7c12",
+        "name": "",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 110,
+        "y": 380,
+        "wires": [
+            [
+                "da3e6819a8b0a5b2"
+            ]
+        ]
+    },
+    {
+        "id": "f3893275be50f247",
+        "type": "inject",
+        "z": "2af30d41037b7c12",
+        "name": "Clear",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[]",
+        "payloadType": "json",
+        "x": 250,
+        "y": 120,
+        "wires": [
+            [
+                "80d2e762b97bdcfa"
+            ]
+        ]
+    },
+    {
+        "id": "2a4951f74f962305",
+        "type": "ui-group",
+        "name": "Group 1",
+        "page": "0e9d854ab5d3f84c",
+        "width": 6,
+        "height": 1,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
+    },
+    {
+        "id": "0e9d854ab5d3f84c",
+        "type": "ui-page",
+        "name": "Page 1",
+        "ui": "454fa7ebba8c8660",
+        "path": "/page1",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "34a8f0c2a227a077",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": 0,
+                "cols": 3
+            },
+            {
+                "name": "Tablet",
+                "px": 576,
+                "cols": 6
+            },
+            {
+                "name": "Small Desktop",
+                "px": 768,
+                "cols": 9
+            },
+            {
+                "name": "Desktop",
+                "px": 1024,
+                "cols": 12
+            }
+        ],
+        "order": 1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "454fa7ebba8c8660",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true
+    },
+    {
+        "id": "34a8f0c2a227a077",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#000000",
+            "primary": "#0094ce",
+            "bgPage": "#303030",
+            "groupBg": "#171717",
+            "groupOutline": "#cccccc"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    }
+]
