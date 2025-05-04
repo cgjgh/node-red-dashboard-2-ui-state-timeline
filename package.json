@@ -1,10 +1,12 @@
 {
   "name": "@cgjgh/node-red-dashboard-2-ui-state-timeline",
   "version": "0.0.9",
-  "description": "",
+  "description": "A State Timeline Node for Dashboard 2.0",
   "keywords": [
     "node-red",
-    "node-red-dashboard-2"
+    "node-red-dashboard-2",
+    "state-timeline",
+    "history"
   ],
   "repository": {
     "type": "git",
