@@ -1,6 +1,6 @@
 {
   "name": "@cgjgh/node-red-dashboard-2-ui-state-timeline",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "A State Timeline Node for Dashboard 2.0",
   "keywords": [
     "node-red",
