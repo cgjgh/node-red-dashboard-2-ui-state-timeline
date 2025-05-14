@@ -72,8 +72,25 @@ module.exports = function (RED) {
 
         // Retrieve the dashboard group
         const group = RED.nodes.getNode(config.group)
+        if (!group) {
+            node.error('No group configured')
+            node.status({
+                shape: 'ring',
+                fill: 'red',
+                text: 'no group'
+            })
+            return
+        }
         const base = group ? group.getBase() : null
-
+        if (!base) {
+            node.error('No base configured')
+            node.status({
+                shape: 'ring',
+                fill: 'red',
+                text: 'no base'
+            })
+            return
+        }
         // Internal state to store segments
         let segments = [] // Array of { start: number, end: number, state: string }
         let currentState = null // Tracks the current pending state (e.g., { time, state })
