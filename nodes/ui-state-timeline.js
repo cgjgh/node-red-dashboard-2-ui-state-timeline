@@ -68,7 +68,12 @@ module.exports = function (RED) {
             state.value = RED.util.evaluateNodeProperty(state.value, state.valueType, node)
         })
 
+        // Build allowedStates and a map of value types for type checking
         const allowedStates = (config.states || []).map(state => state.value)
+        const allowedStateTypes = {}
+        for (const state of config.states || []) {
+            allowedStateTypes[state.value] = state.valueType
+        }
 
         // Retrieve the dashboard group
         const group = RED.nodes.getNode(config.group)
@@ -194,30 +199,86 @@ module.exports = function (RED) {
 
                 // Handle message payload
                 const payload = msg.payload
-                if (!payload) {
+                if (payload === null || typeof payload === 'undefined') { // Modified to catch undefined as well
                     node.error('No payload provided in message', msg)
                     return
                 }
 
+                let processedInput = false // Flag to track if input was processed
+
                 if (Array.isArray(payload)) {
                     // Array input: [{"time": number, "state": string}, ...]
                     segments = processArrayInput(payload)
-                    // Remove old segments from memory
-                    segments = filterSegmentsByRange(segments, rangeLimit, rangeLimitUnit)
-                    // Set msg.payload.segments with the current segments
-                    msg.payload = {
-                        stateData: segments.map(segment => ({
-                            start: new Date(segment.start).toISOString(),
-                            end: new Date(segment.end).toISOString(),
-                            state: segment.state
-                        }))
-                    }
-                } else if (typeof payload === 'object' && payload.time !== null && payload.state !== null) {
+                    processedInput = true
+                } else if (
+                    typeof payload === 'object' &&
+                    payload !== null &&
+                    payload.time !== undefined &&
+                    payload.state !== undefined &&
+                    payload.state !== null &&
+                    payload.state !== ''
+                ) {
                     // Single state input: {"time": number, "state": string}
                     processSingleInput(payload)
+                    processedInput = true
+                } else if (
+                    // Accept direct state value (string, number, boolean) as payload
+                    (
+                        typeof payload === 'string' ||
+                        typeof payload === 'number' ||
+                        typeof payload === 'boolean'
+                    ) &&
+                    String(payload).trim() !== ''
+                ) {
+                    // Validate against allowedStates
+                    if (allowedStates.length > 0 && !allowedStates.includes(payload)) {
+                        node.error(`Invalid state '${payload}' provided. Allowed values are: ${allowedStates.join(', ')}. Input ignored.`, msg)
+                        return
+                    }
+
+                    // Type check: Verify the payload matches the expected type for this state
+                    const expectedType = allowedStateTypes[payload]
+                    let typeOk = false
+
+                    if (expectedType) {
+                        switch (expectedType) {
+                        case 'str':
+                            typeOk = typeof payload === 'string'
+                            break
+                        case 'num':
+                            typeOk = typeof payload === 'number'
+                            break
+                        case 'bool':
+                            typeOk = typeof payload === 'boolean'
+                            break
+                        default:
+                            // Accept as fallback
+                            typeOk = true
+                        }
+
+                        if (!typeOk) {
+                            node.error(`State value '${payload}' is not of expected type '${expectedType}'. Input ignored.`, msg)
+                            return
+                        }
+                    }
+
+                    // Use current time
+                    const newPayload = {
+                        time: Date.now(),
+                        state: payload
+                    }
+                    processSingleInput(newPayload)
+                    processedInput = true
+                } else {
+                    node.error('Invalid payload format. Expected object with time/state, an array of such objects, or a non-empty string/number/boolean.', msg)
+                    return
+                }
+
+                if (processedInput) {
                     // Remove old segments from memory
                     segments = filterSegmentsByRange(segments, rangeLimit, rangeLimitUnit)
                     // Set msg.payload.segments with the current segments
+                    // Ensure segments are always mapped to ISOString, even for string input
                     msg.payload = {
                         stateData: segments.map(segment => ({
                             start: new Date(segment.start).toISOString(),
@@ -225,9 +286,6 @@ module.exports = function (RED) {
                             state: segment.state
                         }))
                     }
-                } else {
-                    node.error('Invalid payload format. Expected object or array.', msg)
-                    return
                 }
 
                 if (segments.length > 0) {
@@ -283,7 +341,8 @@ module.exports = function (RED) {
         function processSingleInput (data) {
             const { time, state } = data
             // --- Validation ---
-            if (typeof time !== 'number' || state === undefined || state === null || state === '') {
+            // Validate time and state
+            if (typeof time !== 'number' || state === undefined || state === null || String(state).trim() === '') {
                 node.error('Invalid input: "time" must be a number and "state" must be provided and non-empty.')
                 return // Stop processing this invalid input
             }
@@ -363,7 +422,8 @@ module.exports = function (RED) {
          * @returns {Array} - Filtered segments within the window
          */
         function processArrayInput (array) {
-            if (!Array.isArray(array) || !array.every(item => typeof item.time === 'number' && item.state !== undefined && item.state !== null && item.state !== '')) {
+            // Validate array items
+            if (!Array.isArray(array) || !array.every(item => typeof item.time === 'number' && item.state !== undefined && item.state !== null && String(item.state).trim() !== '')) {
                 node.error('Invalid array input: All items must have time (number) and non-empty state.')
                 return []
             }
@@ -378,7 +438,8 @@ module.exports = function (RED) {
                 const { time, state } = item
 
                 // --- Validation ---
-                if (typeof time !== 'number' || state === undefined || state === null || state === '') {
+                // Redundant check as it's covered by array.every above, but kept for clarity if individual items are ever processed differently.
+                if (typeof time !== 'number' || state === undefined || state === null || String(state).trim() === '') {
                     node.error('Invalid input in array: "time" must be a number and "state" must be provided and non-empty.')
                     continue
                 }

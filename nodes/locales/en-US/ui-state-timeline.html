@@ -72,15 +72,15 @@
 
 <h3>Input</h3>
 <p>
-    The State Timeline node accepts messages to update the timeline. The payload can be either a single state change, an array of state changes, or an empty array to clear the timeline.
+    The State Timeline node accepts messages to update the timeline. The payload can be a single state change, an array of state changes, a direct state value, or an empty array to clear the timeline.
 </p>
 <dl class="message-properties">
     <dt>Single State Change <span class="property-type">object</span></dt>
     <dd>
         <pre>msg.payload = { time: 1717000000000, state: "on" }</pre>
         <ul>
-            <li><b>time</b>: Timestamp in milliseconds (e.g., from <code>Date.now()</code>).</li>
-            <li><b>state</b>: The state value (must match one of the configured states).</li>
+            <li><b>time</b>: Timestamp in milliseconds (e.g., from <code>Date.now()</code>). If omitted, current time will be used.</li>
+            <li><b>state</b>: The state value (must match one of the configured states and type).</li>
         </ul>
         <p>
             Each message marks a transition to a new state at the given time. The timeline will extend the previous segment and start a new one for the new state.
@@ -96,6 +96,27 @@
 ]</pre>
         <p>
             An array of state changes, each with a <code>time</code> and <code>state</code>. The array should be sorted by time. The node will construct the timeline from these segments.
+        </p>
+    </dd>
+
+    <dt>Direct State Value <span class="property-type">string/number/boolean</span></dt>
+    <dd>
+        <pre>msg.payload = "on"</pre>
+        <pre>msg.payload = 1</pre>
+        <pre>msg.payload = true</pre>
+        <ul>
+            <li>
+                If the payload is a direct value (string, number, or boolean), the node will treat it as a state value and use the current time as the timestamp.
+            </li>
+            <li>
+                The value must match one of the configured states <b>and</b> be of the correct type as defined in the node configuration.
+            </li>
+            <li>
+                If the value is not allowed or is of the wrong type, the message will be ignored and an error will be logged.
+            </li>
+        </ul>
+        <p>
+            This allows for simple state updates without needing to construct an object with a <code>time</code> property.
         </p>
     </dd>
 
@@ -150,7 +171,8 @@ msg.payload = {
 
 <h3>Notes</h3>
 <ul>
-    <li>State values must match one of the configured states. Invalid or duplicate states are ignored.</li>
+    <li>State values must match one of the configured states <b>and</b> be of the correct type. Invalid or duplicate states are ignored.</li>
+    <li>If a direct state value is provided as payload, the current time will be used as the timestamp.</li>
     <li>Time must be a number (milliseconds since epoch). Out-of-order or overlapping times are ignored.</li>
     <li>At least two unique states must be configured for the timeline to function.</li>
     <li>Live Update will keep the last segment's end time current until a new state is received.</li>

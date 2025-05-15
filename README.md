@@ -68,7 +68,7 @@ npm install @cgjgh/node-red-dashboard-2-ui-state-timeline
 
 1. **Add the node** to your flow and connect it to the data source whose state you want to visualize.
 2. **Configure the states** you want to track (e.g., On/Off, Open/Closed, etc.).
-3. **Send messages** to the node with the following payload formats:
+3. **Send messages** to the node with one of the following payload formats:
 
 ### Input Message Formats
 
@@ -77,7 +77,7 @@ npm install @cgjgh/node-red-dashboard-2-ui-state-timeline
 - `time`: Unix timestamp in milliseconds (e.g., `1710000000000`)
 - `state`: Value matching one of your configured states (e.g., `"on"`)
 
-#### Single State Change
+#### Single State Change (Object)
 
 ```json
 {
@@ -99,6 +99,35 @@ npm install @cgjgh/node-red-dashboard-2-ui-state-timeline
   ]
 }
 ```
+
+#### Direct State Value (String/Number/Boolean)
+
+You can now send a direct state value as the payload.  
+The node will use the current time as the timestamp and process the state if it matches one of your configured states and is of the correct type.
+
+```json
+{
+  "payload": "on"
+}
+```
+or
+```json
+{
+  "payload": 1
+}
+```
+or
+```json
+{
+  "payload": true
+}
+```
+
+- The node will check that the value matches one of your configured states and is of the correct type (as set in the node configuration).
+- If valid, the node will use the current time for the state change.
+
+**Note:**  
+If the payload is a direct value (not an object or array), it must match both the value and type of one of your configured states. Otherwise, the message will be ignored and an error will be logged.
 
 - The node will build the timeline from the provided state changes.
 - Timestamps must be in milliseconds (JavaScript Date format).
