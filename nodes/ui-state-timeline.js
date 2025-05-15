@@ -38,18 +38,39 @@ module.exports = function (RED) {
 
     /**
      * Helper to filter segments by time window (rangeLimit * rangeLimitUnit seconds)
+     * and adjust start times of segments that partially overlap the window's beginning.
      * @param {Array} segments - Array of {start, end, state}
      * @param {number} rangeLimit - Number of units (e.g., 24)
      * @param {string|number} rangeLimitUnit - Unit in seconds (e.g., 3600)
-     * @returns {Array} - Filtered segments
+     * @returns {Array} - Filtered and adjusted segments
      */
     function filterSegmentsByRange (segments, rangeLimit, rangeLimitUnit) {
         if (!rangeLimit || !rangeLimitUnit) return segments
         const now = Date.now()
         const windowMs = Number(rangeLimit) * Number(rangeLimitUnit) * 1000
         const windowStart = now - windowMs
-        // Only include segments that overlap with the window
-        return segments.filter(seg => seg.end >= windowStart)
+
+        const filteredAndAdjustedSegments = []
+
+        for (const seg of segments) {
+            // Case 1: Segment is entirely outside (before) the window
+            if (seg.end < windowStart) {
+                continue // Skip this segment
+            }
+
+            // Case 2: Segment is entirely within the window or ends after the window
+            if (seg.start >= windowStart) {
+                filteredAndAdjustedSegments.push(seg)
+            } else if (seg.start < windowStart && seg.end >= windowStart) {
+                // Case 3: Segment starts before the window but ends within or after the window
+
+                filteredAndAdjustedSegments.push({
+                    ...seg,
+                    start: windowStart // Adjust start time to the beginning of the window
+                })
+            }
+        }
+        return filteredAndAdjustedSegments
     }
 
     function StateTimelineNode (config) {
