@@ -9,7 +9,8 @@
           "label": "Label",
           "barHeight": "Bar Height",
           "states": "States",
-          "timeFormat": "Time Format",
+          "timelineTimeFormat": "Timeline Time Format",
+          "detailsTimeFormat": "Details Time Format",
           "minTimeLabelGap": "Min Label Gap (%)",
           "rangeLimit": "Time Range Limit",
           "liveUpdate": "Live Update",
@@ -30,7 +31,8 @@
           "showOnlyStartEndTimes": "Only show time at start and end of timeline bar"
       },
       "help": {
-          "timeFormat": "Format string for displaying time labels (e.g., 'hh:mm a'). Supported tokens: YYYY (4-digit year), YY (2-digit year), MM (2-digit month), M (month), DD (2-digit day), D (day), hh (2-digit 12-hour), h (12-hour), HH (2-digit 24-hour), H (24-hour), mm (2-digit minutes), m (minutes), a (am/pm), A (AM/PM)."
-      }
+        "timelineTimeFormat": "Format string for timeline axis and marker labels (e.g., <code>hh:mm a</code>).",
+        "detailsTimeFormat": "Format string for date and time in the details card (e.g., <code>YYYY-MM-DD hh:mm a</code>)."      
+    }
   }
 }

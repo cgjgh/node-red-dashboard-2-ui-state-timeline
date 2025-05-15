@@ -40,7 +40,9 @@
                         return v.length === unique.size && v.length > 1
                     }
                 },
-                timeFormat: { value: 'h:mm A' },
+                // Timeline and details time formats
+                timelineTimeFormat: { value: 'h:mm A' },
+                detailsTimeFormat: { value: 'M/DD/YY h:mm A' },
                 minTimeLabelGap: { value: 6, validate: RED.validators.number() },
                 liveUpdate: { value: true },
                 rangeLimit: { value: 24, validate: RED.validators.number() },
@@ -152,6 +154,14 @@
                 // Set the liveUpdate checkbox based on node property
                 $('#node-input-liveUpdate').prop('checked', !!this.liveUpdate);
                 
+                // Set the timelineTimeFormat and detailsTimeFormat input values
+                $('#node-input-timelineTimeFormat').val(
+                    this.timelineTimeFormat || 'h:mm A'
+                );
+                $('#node-input-detailsTimeFormat').val(
+                    this.detailsTimeFormat || 'M/DD/YY h:mm A'
+                );
+                
                 // Set initial values for range limit
                 $('#node-input-rangeLimit').val(this.rangeLimit || 24);
                 $('#node-input-rangeLimitUnit').val(this.rangeLimitUnit || '3600');
@@ -201,6 +211,10 @@
                 })
                 // Save the liveUpdate checkbox value
                 node.liveUpdate = $('#node-input-liveUpdate').is(':checked');
+                // Save the timelineTimeFormat and detailsTimeFormat values
+                node.timelineTimeFormat = $('#node-input-timelineTimeFormat').val() || 'h:mm A';
+                node.detailsTimeFormat = $('#node-input-detailsTimeFormat').val() || 'M/DD/YY h:mm A';
+                
                 // Save the range limit values
                 node.rangeLimit = parseInt($('#node-input-rangeLimit').val(), 10) || 24;
                 node.rangeLimitUnit = $('#node-input-rangeLimitUnit').val() || '3600';
@@ -252,21 +266,38 @@
     </div>
   
     <div class="form-row">
-        <label for="node-input-timeFormat">
+        <label for="node-input-timelineTimeFormat">
             <i class="fa fa-clock-o"></i>
-            <span data-i18n="ui-state-timeline.label.timeFormat">Time Format</span>
+            <span data-i18n="ui-state-timeline.label.timelineTimeFormat">Timeline Time Format</span>
             <a
                 data-html="true"
                 class="red-ui-button ui-node-popover-title"
                 style="margin-left: 4px; cursor: help; font-size: 0.625rem; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center;"
                 tabindex="0"
-                data-i18n="[title]ui-state-timeline.help.timeFormat"
+                data-i18n="[title]ui-state-timeline.help.timelineTimeFormat"
             >
                 <i class="fa fa-question"></i>
             </a>
         </label>
-        <input type="text" id="node-input-timeFormat" placeholder="e.g., hh:mm a">
+        <input type="text" id="node-input-timelineTimeFormat" placeholder="e.g., h:mm A">
     </div>
+    <div class="form-row">
+        <label for="node-input-detailsTimeFormat">
+            <i class="fa fa-calendar"></i>
+            <span data-i18n="ui-state-timeline.label.detailsTimeFormat">Details Time Format</span>
+            <a
+                data-html="true"
+                class="red-ui-button ui-node-popover-title"
+                style="margin-left: 4px; cursor: help; font-size: 0.625rem; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center;"
+                tabindex="0"
+                data-i18n="[title]ui-state-timeline.help.detailsTimeFormat"
+            >
+                <i class="fa fa-question"></i>
+            </a>
+        </label>
+        <input type="text" id="node-input-detailsTimeFormat" placeholder="e.g., M/DD/YY h:mm A">
+    </div>
+    
     <div class="form-row">
         <label for="node-input-minTimeLabelGap"><i class="fa fa-arrows-h"></i> <span data-i18n="ui-state-timeline.label.minTimeLabelGap">Min Label Gap (%)</span></label>
         <input type="number" id="node-input-minTimeLabelGap" placeholder="6">

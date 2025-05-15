@@ -49,13 +49,13 @@
                                 <v-list-item>
                                     <v-list-item-title class="text-caption">Start:</v-list-item-title>
                                     <v-list-item-subtitle class="text-body-2">
-                                        {{ formatTime(new Date(segment.start)) }}
+                                        {{ formatTime(new Date(segment.start), detailsTimeFormat) }}
                                     </v-list-item-subtitle>
                                 </v-list-item>
                                 <v-list-item>
                                     <v-list-item-title class="text-caption">End:</v-list-item-title>
                                     <v-list-item-subtitle class="text-body-2">
-                                        {{ formatTime(new Date(segment.end)) }}
+                                        {{ formatTime(new Date(segment.end), detailsTimeFormat) }}
                                     </v-list-item-subtitle>
                                 </v-list-item>
                                 <v-list-item>
@@ -117,8 +117,15 @@ export default {
         barHeight () {
             return this.getProperty('barHeight') || 30
         },
-        timeFormat () {
-            return this.getProperty('timeFormat') || 'hh:mm a'
+        // Timeline time format (for axis/markers)
+        timelineTimeFormat () {
+            // Configurable via props.timelineTimeFormat, fallback to default
+            return this.getProperty('timelineTimeFormat') || 'h:mm A'
+        },
+        // Details card time format (for popover/details)
+        detailsTimeFormat () {
+            // Configurable via props.detailsTimeFormat, fallback to default
+            return this.getProperty('detailsTimeFormat') || 'M/DD/YY h:mm A'
         },
         minTimeLabelGap () {
             return this.getProperty('minTimeLabelGap') || 6
@@ -163,7 +170,7 @@ export default {
             const totalStart = this.totalStartMs
             const totalDuration = this.totalDurationMs
             markers.push({
-                label: this.formatTime(new Date(totalStart)),
+                label: this.formatTime(new Date(totalStart), this.timelineTimeFormat),
                 position: 0,
                 time: totalStart
             })
@@ -172,7 +179,7 @@ export default {
                 if (!markers.some(m => m.time === segmentEndMs)) {
                     const position = Math.min(100, Math.max(0, ((segmentEndMs - totalStart) / totalDuration) * 100))
                     markers.push({
-                        label: this.formatTime(new Date(segment.end)),
+                        label: this.formatTime(new Date(segment.end), this.timelineTimeFormat),
                         position,
                         time: segmentEndMs
                     })
@@ -232,6 +239,8 @@ export default {
                 this.updateDynamicProperty('options', updates.options)
                 this.updateDynamicProperty('showTimeMarkers', updates.showTimeMarkers)
                 this.updateDynamicProperty('showOnlyStartEndTimes', updates.showOnlyStartEndTimes)
+                this.updateDynamicProperty('timelineTimeFormat', updates.timelineTimeFormat)
+                this.updateDynamicProperty('detailsTimeFormat', updates.detailsTimeFormat)
             }
         },
         onDynamicProperty (msg) {
@@ -241,6 +250,8 @@ export default {
                 this.updateDynamicProperty('options', updates.options)
                 this.updateDynamicProperty('showTimeMarkers', updates.showTimeMarkers)
                 this.updateDynamicProperty('showOnlyStartEndTimes', updates.showOnlyStartEndTimes)
+                this.updateDynamicProperty('timelineTimeFormat', updates.timelineTimeFormat)
+                this.updateDynamicProperty('detailsTimeFormat', updates.detailsTimeFormat)
             }
         },
         getWidth (segment) {
@@ -260,7 +271,13 @@ export default {
             const definition = this.stateDefinitions.find(def => def.value === stateValue)
             return definition ? definition.label : stateValue
         },
-        formatTime (input) {
+        /**
+         * Format a Date/time value using the provided format string.
+         * @param {Date|string|number} input - The date/time to format.
+         * @param {string} formatOverride - The format string to use.
+         * @returns {string}
+         */
+        formatTime (input, formatOverride) {
             let time
             if (input instanceof Date) {
                 time = input
@@ -274,7 +291,7 @@ export default {
                 console.warn('Invalid date passed to formatTime:', input)
                 return 'Invalid Time'
             }
-            const format = this.timeFormat || 'HH:mm'
+            const format = formatOverride || this.timelineTimeFormat || 'HH:mm'
             const hours24 = time.getHours()
             const hours12 = hours24 % 12 === 0 ? 12 : hours24 % 12
             const minutes = time.getMinutes()

@@ -32,11 +32,16 @@
         <p>At least two states must be configured, and all values must be unique.</p>
     </dd>
 
-    <dt>Time Format <span class="property-type">string</span></dt>
+    <dt>Timeline Time Format <span class="property-type">string</span></dt>
     <dd>
-        Format string for displaying time labels (e.g., <code>hh:mm a</code>). Supports the following tokens:<br>
+        Format string for displaying time labels on the timeline axis and markers (e.g., <code>hh:mm a</code>). Supports the following tokens:<br>
         <code>YYYY</code> (4-digit year), <code>YY</code> (2-digit year), <code>MM</code> (2-digit month), <code>M</code> (month), <code>DD</code> (2-digit day), <code>D</code> (day),<br>
         <code>hh</code> (2-digit 12-hour), <code>h</code> (12-hour), <code>HH</code> (2-digit 24-hour), <code>H</code> (24-hour), <code>mm</code> (2-digit minutes), <code>m</code> (minutes), <code>a</code> (am/pm), <code>A</code> (AM/PM).
+    </dd>
+
+    <dt>Details Time Format <span class="property-type">string</span></dt>
+    <dd>
+        Format string for displaying date and time in the details card (popover) for each segment (e.g., <code>YYYY-MM-DD hh:mm a</code>). Supports the same tokens as above.
     </dd>
 
     <dt>Min Label Gap (%) <span class="property-type">number</span></dt>
@@ -140,8 +145,11 @@
     <dt class="optional">barHeight <span class="property-type">number</span></dt>
     <dd>Override the configured bar height.</dd>
 
-    <dt class="optional">timeFormat <span class="property-type">string</span></dt>
-    <dd>Override the configured time format for labels.</dd>
+    <dt class="optional">timelineTimeFormat <span class="property-type">string</span></dt>
+    <dd>Override the configured time format for timeline axis and markers.</dd>
+
+    <dt class="optional">detailsTimeFormat <span class="property-type">string</span></dt>
+    <dd>Override the configured time format for the details card (popover).</dd>
 
     <dt class="optional">minTimeLabelGap <span class="property-type">number</span></dt>
     <dd>Override the minimum label gap percentage.</dd>
